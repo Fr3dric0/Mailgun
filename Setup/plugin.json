@@ -1,0 +1,31 @@
+{
+  "title": "Mailgun",
+  "name": "Mailgun",
+  "version": "1.00",
+  "author": "Fredrik F. Lindhagen",
+  "options": [
+    {
+      "name": "apiKey",
+      "label": "API Key",
+      "type": "Text",
+      "required": true
+    },
+    {
+      "name": "domain",
+      "label": "Domain",
+      "type": "Text",
+      "required": true
+    },
+    {
+      "name": "defaultRecipientAddress",
+      "label": "Default Recipient Address",
+      "type": "Email",
+      "required": true
+    },
+    {
+      "name": "defaultSendAddress",
+      "label": "Default Sending Address",
+      "type": "Email"
+    }
+  ]
+}
