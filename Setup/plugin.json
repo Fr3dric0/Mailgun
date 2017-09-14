@@ -26,6 +26,17 @@
       "name": "defaultSendAddress",
       "label": "Default Sending Address",
       "type": "Email"
+    },
+    {
+      "name": "isSandbox",
+      "label": "Sandbox Mode",
+      "type": "Checkbox"
+    },
+    {
+      "name": "sandboxEmail",
+      "label": "Sandbox Email",
+      "hint": "Overrides all TO, CC and BCC fields",
+      "type": "Email"
     }
   ]
 }
