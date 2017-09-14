@@ -27,10 +27,10 @@ class Model
         if (class_exists('Mailgun')) {
             throw new Exception('Missing required composer module Mailgun!');
         }
-
-        if (!isset(self::$mg)) {
-            self::$mg = Mailgun::create(ipGetOption('Mailgun.apiKey'));
-        }
+//
+//        if (!isset(self::$mg)) {
+//            self::$mg = Mailgun::create(ipGetOption('Mailgun.apiKey'));
+//        }
 
         $this->from = $from;
         $this->subject = $subject;
@@ -40,9 +40,7 @@ class Model
             ipGetOptionLang('Config.websiteEmail')
         );
 
-        $this->domain = !empty($domain) ?
-            $domain :
-            ipGetOption('Mailgun.domain');
+        $this->domain = $domain;
 
         $this->key = ipGetOption('Mailgun.apiKey');
     }
@@ -86,9 +84,11 @@ class Model
     {
         $isSandbox = ipGetOption("Mailgun.isSandbox", false) == true;
 
+        $mg = \Mailgun\Mailgun::create(ipGetOption('Mailgun.apiKey'));
+
         $data = [
             'from' => !empty($this->fromName) ?
-                $this->fromName . "<$this->from>" : $this->from,
+                $this->fromName . " <$this->from>" : $this->from,
             'to' => !$isSandbox ? $this->to : ipGetOption("Mailgun.sandboxEmail", $this->to),
             'subject' => $this->subject,
             'html' => $this->html,
@@ -107,7 +107,7 @@ class Model
             $data['bcc'] = ipGetOption('Mailgun.sandboxEmail', $data['bcc']);
         }
 
-        return self::$mg->messages()->send($this->domain, $data);
+        $mg->messages()->send(ipGetOption('Mailgun.domain', $this->domain), $data);
     }
 
     public static function createForm()
