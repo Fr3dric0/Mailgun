@@ -3,13 +3,14 @@
 namespace Plugin\Mailgun;
 
 use Ip\Exception;
+use Mailgun\Exception\HttpClientException;
 use Mailgun\Mailgun;
 
 class Model
 {
 
     private static $mg;
-    private $from, $fromName, $subject, $to, $html, $plain;
+    private $from, $fromName, $subject, $to, $to_name, $html, $plain;
     private $replyTo = null;
     private $domain, $key;
     private $tags = [];
@@ -45,6 +46,11 @@ class Model
         $this->key = ipGetOption('Mailgun.apiKey');
     }
 
+    public function setToName($name) {
+        $this->to_name = $name;
+        return $this;
+    }
+
     public function setFromName($name)
     {
         $this->fromName = $name;
@@ -78,11 +84,22 @@ class Model
     public function setReplyTo($replyTo)
     {
         $this->replyTo = $replyTo;
+
+        return $this;
     }
 
     public function send()
     {
         $isSandbox = ipGetOption("Mailgun.isSandbox", false) == true;
+
+        if (empty($this->html) && empty($this->plain)) {
+            ipLog()->warning("[WARN] Trying to send message with empty body", [
+                'html' => $this->html,
+                'plain' => $this->plain
+            ]);
+
+            throw new HttpClientException("Missing e-mail body! Please populate html og plain before sending", 400);
+        }
 
         $mg = \Mailgun\Mailgun::create(ipGetOption('Mailgun.apiKey'));
 
@@ -90,6 +107,7 @@ class Model
             'from' => !empty($this->fromName) ?
                 $this->fromName . " <$this->from>" : $this->from,
             'to' => !$isSandbox ? $this->to : ipGetOption("Mailgun.sandboxEmail", $this->to),
+            'to_name' => !empty($this->to_name) ? $this->to_name : null,
             'subject' => $this->subject,
             'html' => $this->html,
             'text' => esc($this->plain)
